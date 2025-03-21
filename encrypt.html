@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Encryption Example</title>
+</head>
+<body>
+    <h2>Offline AES-256-GCM Encryption</h2>
+    <input type="text" id="dataInput" placeholder="Enter text to encrypt" />
+    <button onclick="encryptData()">Encrypt</button>
+    <button onclick="decryptData()">Decrypt</button>
+
+    <p><strong>Encrypted Data:</strong> <span id="encryptedData"></span></p>
+    <p><strong>Decrypted Data:</strong> <span id="decryptedData"></span></p>
+
+    <script>
+        let encryptionKey; // The encryption key for AES
+        let iv; // Initialization Vector (IV) for AES encryption
+
+        // Function to generate a key from a password
+        async function generateKey(password) {
+            const encoder = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                "raw", encoder.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
+            );
+
+            return crypto.subtle.deriveKey(
+                { name: "PBKDF2", salt: encoder.encode("random_salt"), iterations: 100000, hash: "SHA-256" },
+                keyMaterial,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        // Function to encrypt data
+        async function encryptData() {
+            const data = document.getElementById("dataInput").value;
+            if (!data) {
+                alert("Please enter some data to encrypt.");
+                return;
+            }
+
+            // Generate encryption key from a password (for demo, use a fixed password)
+            encryptionKey = await generateKey("securepassword123");
+
+            // Convert data to ArrayBuffer
+            const encodedData = new TextEncoder().encode(data);
+            iv = crypto.getRandomValues(new Uint8Array(12)); // Generate a random IV for AES-GCM
+
+            const algorithm = { name: "AES-GCM", iv: iv };
+            const encryptedData = await crypto.subtle.encrypt(algorithm, encryptionKey, encodedData);
+
+            // Display the encrypted data and IV (in base64 format)
+            const encryptedDataBase64 = arrayBufferToBase64(encryptedData);
+            document.getElementById("encryptedData").innerText = encryptedDataBase64;
+        }
+
+        // Function to decrypt data
+        async function decryptData() {
+            const encryptedDataBase64 = document.getElementById("encryptedData").innerText;
+            if (!encryptedDataBase64) {
+                alert("No encrypted data to decrypt.");
+                return;
+            }
+
+            // Convert encrypted data back from base64
+            const encryptedData = base64ToArrayBuffer(encryptedDataBase64);
+
+            const algorithm = { name: "AES-GCM", iv: iv };
+
+            try {
+                const decryptedData = await crypto.subtle.decrypt(algorithm, encryptionKey, encryptedData);
+                const decodedData = new TextDecoder().decode(decryptedData);
+                document.getElementById("decryptedData").innerText = decodedData;
+            } catch (error) {
+                alert("Decryption failed.");
+            }
+        }
+
+        // Utility function to convert ArrayBuffer to Base64
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        // Utility function to convert Base64 to ArrayBuffer
+        function base64ToArrayBuffer(base64) {
+            const binary_string = window.atob(base64);
+            const len = binary_string.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binary_string.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+    </script>
+</body>
+</html>
