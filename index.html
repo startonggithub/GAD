@@ -6,10 +6,18 @@
     <title>IndexedDB File Storage</title>
 </head>
 <body>
+    <h2>Login Page</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <!--<button onclick="register()">Register</button>-->
+    <button onclick="logout()">Logout</button>
+    <p id="status"></p>
+
     <h2>IndexedDB File Storage</h2>
 
     <div id="signature-pad" class="signature-pad">
-        <div id="canvas-wrapper" class="signature-pad--body">
+        <div id="canvas-wrapper" class="signature-pad--body" style="width: 50vw; height: 10vh; min-width: 300px; min-height: 100px;">
           <canvas></canvas>
         </div>
         <div class="signature-pad--footer">
@@ -34,10 +42,10 @@
                 background</button>
             </div>
           </div>
-    
+          -->
           <div>
             <button type="button" class="button" data-action="open-in-window">Open in Window</button>
-          </div>-->
+          </div>
         </div>
     </div>
 

@@ -34,7 +34,6 @@ function resizeCanvas() {
   // some browsers report devicePixelRatio as less than 1
   // and only part of the canvas is cleared then.
   const ratio = Math.max(window.devicePixelRatio || 1, 1);
-
   // This part causes the canvas to be cleared
   canvas.width = canvas.offsetWidth * ratio;
   canvas.height = canvas.offsetHeight * ratio;
@@ -54,7 +53,7 @@ function resizeCanvas() {
 // On mobile devices it might make more sense to listen to orientation change,
 // rather than window resize events.
 window.onresize = resizeCanvas;
-resizeCanvas();
+//resizeCanvas();
 
 window.addEventListener("keydown", (event) => {
   switch (true) {
@@ -181,7 +180,7 @@ saveSVGWithBackgroundButton.addEventListener("click", () => {
     download(dataURL, "signature.svg");
   }
 });
-
+*/
 openInWindowButton.addEventListener("click", () => {
 	var externalWin = window.open('', '', `width=${canvas.width / window.devicePixelRatio},height=${canvas.height / window.devicePixelRatio}`);
   canvas.style.width = "100%";
@@ -198,4 +197,3 @@ openInWindowButton.addEventListener("click", () => {
     resizeCanvas();
   };
 })
-*/

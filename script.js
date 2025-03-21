@@ -23,8 +23,44 @@ request.onerror = (event) => {
     console.error("Database error:", event.target.error);
 };
 
+// Login User
+function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    //document.getElementById("status").innerText = `Logged in as ${userCredential.user.email}`;
+    document.getElementById("status").innerText = `Logged in as ${email}`;
+    sessionStorage.setItem("currentUser", email);  // Store session
+    //loadUserData(userCredential.user.uid);
+/*
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            document.getElementById("status").innerText = `Logged in as ${userCredential.user.email}`;
+            loadUserData(userCredential.user.uid);
+        })
+        .catch(error => alert(error.message));
+*/
+}
+
+// Logout User
+function logout() {
+    /*
+    auth.signOut().then(() => {
+        document.getElementById("status").innerText = "Logged out!";
+        clearUsersTable();  // Only clear "users" table
+    });
+    */
+    document.getElementById("status").innerText = "Logged out!";
+    sessionStorage.removeItem("currentUser");
+}
+
 // Save file to IndexedDB
 function saveFile() {
+    if (!sessionStorage.getItem("currentUser"))
+    {
+        alert("Please login!");
+        return;        
+    }
     /*const fileInput = document.getElementById("fileInput");
     if (fileInput.files.length === 0) {
         alert("Please select a file.");
@@ -63,6 +99,8 @@ function saveFile() {
 
     request.onsuccess = () => {
         alert("Signature saved!");
+        signaturePad.clear();
+        loadFiles();
     };
 
     request.onerror = (error) => {
@@ -72,6 +110,12 @@ function saveFile() {
 
 // Load files from IndexedDB
 function loadFiles() {
+    if (!sessionStorage.getItem("currentUser"))
+        {
+        alert("Please login!");
+        return;        
+    }
+
     const transaction = db.transaction(["files"], "readonly");
     const store = transaction.objectStore("files");
     const request = store.getAll();
